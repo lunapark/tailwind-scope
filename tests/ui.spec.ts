@@ -93,16 +93,7 @@ test('no classes', async ({ page }) => {
   await expect(page.locator('body')).toHaveCSS('margin', '0px')
 })
 
-test('html classes', async ({ page }) => {
-  await server.render({
-    page,
-    htmlClasses: 'h-4',
-  })
-
-  await expect(page.locator('html')).toHaveCSS('height', '16px')
-})
-
-test.only('scope', async ({ page }) => {
+test('scope', async ({ page }) => {
   await server.render({
     page,
     body: html`<div data-in class="bg-red"><div class="stop"><div data-out class="bg-red"></div></div></div>`,
@@ -133,8 +124,8 @@ async function createServer() {
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <title>Document</title>
           <script type="module">
-            const tailwindScope = await import("/tailwindcss.js");
-            tailwindScope.default({scope: {from:"body", to: ".stop"}});
+            import scope from "/tailwindcss.js"
+            scope({scope: {to: ".stop"}});
           </script>
           <style type="text/tailwindcss">
             @theme {

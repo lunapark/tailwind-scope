@@ -301,7 +301,7 @@ function wrapInScope(content: string) {
 
   let scopeRule = "@scope";
 
-  scopeRule += ` (${scope.from || "body"})`;
+  scopeRule += ` (${scope.from || ":root"})`;
 
   if (scope.to) {
     scopeRule += ` to (${scope.to})`
