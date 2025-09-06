@@ -1,17 +1,17 @@
 {
     "name": "@luna-park/tailwind-scope",
-    "version": "4.1.13",
-    "description": "A utility-first CSS framework for rapidly building custom user interfaces.",
+    "version": "1.0.0",
+    "description": "Inject Tailwind CSS into your HTML files with a scoped rule.",
     "license": "MIT",
     "main": "./dist/index.mjs",
     "browser": "./dist/index.mjs",
     "repository": {
         "type": "git",
-        "url": "https://github.com/tailwindlabs/tailwindcss.git",
+        "url": "https://github.com/lunapark/tailwind-scope.git",
         "directory": "packages/@tailwindcss-browser"
     },
-    "bugs": "https://github.com/tailwindlabs/tailwindcss/issues",
-    "homepage": "https://tailwindcss.com",
+    "bugs": "https://github.com/lunapark/tailwind-scope/issues",
+    "homepage": "https://github.com/lunapark/tailwind-scope",
     "scripts": {
         "lint": "tsc --noEmit",
         "build": "tsup-node",
