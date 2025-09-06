@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { readFile } from 'node:fs/promises'
+import {appendResponseHeaders} from "h3";
 
 const html = String.raw
 
@@ -101,6 +102,16 @@ test('html classes', async ({ page }) => {
   await expect(page.locator('html')).toHaveCSS('height', '16px')
 })
 
+test.only('scope', async ({ page }) => {
+  await server.render({
+    page,
+    body: html`<div data-in class="bg-red"><div class="stop"><div data-out class="bg-red"></div></div></div>`,
+  })
+
+  await expect(page.locator('[data-in]')).toHaveCSS('background-color', 'rgb(255, 0, 0)')
+  await expect(page.locator('[data-out]')).not.toHaveCSS('background-color', 'rgb(255, 0, 0)')
+})
+
 async function createServer() {
   const { createApp, createRouter, defineEventHandler, toNodeListener } = await import('h3')
   const { listen } = await import('listhen')
@@ -121,7 +132,10 @@ async function createServer() {
           <meta http-equiv="X-UA-Compatible" content="IE=edge" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
           <title>Document</title>
-          <script src="/tailwindcss.js"></script>
+          <script type="module">
+            const tailwindScope = await import("/tailwindcss.js");
+            tailwindScope.default({scope: {from:"body", to: ".stop"}});
+          </script>
           <style type="text/tailwindcss">
             @theme {
               --color-red: #ff0000;
@@ -150,7 +164,12 @@ async function createServer() {
 
   router.get(
     '/tailwindcss.js',
-    defineEventHandler(() => readFile(require.resolve('@tailwindcss/browser'))),
+    defineEventHandler((event) => {
+      appendResponseHeaders(event, {
+        "content-type": "text/javascript",
+      });
+      return readFile(require.resolve('@luna-park/tailwind-scope'));
+    }),
   )
 
   app.use(router)

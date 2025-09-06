@@ -50,6 +50,11 @@ let nextBuildId = 1
 let I = new Instrumentation()
 
 /**
+ * The scope of the stylesheets to be processed.
+ */
+let scope: {from?: string, to?: string} = {}
+
+/**
  * Create the Tailwind CSS compiler
  *
  * This handles loading imports, plugins, configs, etc…
@@ -200,7 +205,7 @@ async function build(kind: 'full' | 'incremental') {
   // 2. Compile the CSS
   I.start(`Build utilities`)
 
-  sheet.textContent = compiler.build(Array.from(newClasses))
+  sheet.textContent = wrapInScope(compiler.build(Array.from(newClasses)))
 
   I.end(`Build utilities`)
 }
@@ -289,6 +294,27 @@ new MutationObserver((records) => {
   subtree: true,
 })
 
-rebuild('full')
+function wrapInScope(content: string) {
+  if (!scope.from && !scope.to) {
+    return content;
+  }
 
-document.head.append(sheet)
+  let scopeRule = "@scope";
+
+  scopeRule += ` (${scope.from || "body"})`;
+
+  if (scope.to) {
+    scopeRule += ` to (${scope.to})`
+  }
+
+  return `${scopeRule}{${content.replaceAll(":root", ":scope")}}`
+}
+
+export default (options: {scope?: {from?: string, to?: string}} = {}) => {
+  if (options.scope) {
+    scope = options.scope
+  }
+
+  rebuild('full')
+  document.head.append(sheet)
+}
